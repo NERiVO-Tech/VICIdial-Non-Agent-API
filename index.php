@@ -284,35 +284,42 @@
             <h3 class="fw-bold mb-1" id="pageTitle"><i class="bi bi-telephone-inbound-fill text-purple me-2" style="color:var(--accent)"></i>VICIdial Non-Agent API Panel</h3>
             <p class="text-secondary mb-0 small">Select a function from the sidebar to get started.</p>
         </div>
-        <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Toggle Light/Dark Theme">
-            <i class="bi" id="themeIcon"></i>
-        </button>
+        <div class="d-flex gap-2">
+            <button class="theme-toggle" id="settingsToggle" onclick="document.getElementById('connSettingsCollapse').classList.toggle('show')" title="Connection Settings">
+                <i class="bi bi-gear-fill"></i>
+            </button>
+            <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Toggle Light/Dark Theme">
+                <i class="bi" id="themeIcon"></i>
+            </button>
+        </div>
     </div>
 
-    <!-- Connection Settings (Always Visible) -->
-    <div class="glass-card mb-4">
-        <h6 class="fw-semibold mb-3"><i class="bi bi-plug-fill me-2" style="color:var(--accent)"></i>Connection Settings</h6>
-        <div class="row g-3">
-            <div class="col-md-4">
-                <label class="form-label">Server Domain / IP <span class="text-danger">*</span></label>
-                <div class="input-group">
-                    <select class="form-select" id="connProtocol" style="max-width:100px;">
-                        <option value="http://">http://</option>
-                        <option value="https://">https://</option>
-                    </select>
-                    <input type="text" class="form-control" id="connDomain" placeholder="192.168.1.100">
+    <!-- Connection Settings (Collapsible) -->
+    <div class="collapse mb-4" id="connSettingsCollapse">
+        <div class="glass-card">
+            <h6 class="fw-semibold mb-3"><i class="bi bi-plug-fill me-2" style="color:var(--accent)"></i>Connection Settings</h6>
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label">Server Domain / IP <span class="text-danger">*</span></label>
+                    <div class="input-group">
+                        <select class="form-select" id="connProtocol" style="max-width:100px;">
+                            <option value="http://">http://</option>
+                            <option value="https://">https://</option>
+                        </select>
+                        <input type="text" class="form-control" id="connDomain" placeholder="192.168.1.100">
+                    </div>
+                    <div class="form-text text-secondary">Server hostname or IP address</div>
                 </div>
-                <div class="form-text text-secondary">Server hostname or IP address</div>
-            </div>
-            <div class="col-md-4">
-                <label class="form-label">Admin User <span class="text-danger">*</span></label>
-                <input type="text" class="form-control" id="connUser" placeholder="6666">
-            </div>
-            <div class="col-md-4">
-                <label class="form-label">Admin Pass <span class="text-danger">*</span></label>
-                <div class="input-group">
-                    <input type="password" class="form-control" id="connPass" placeholder="••••••">
-                    <button class="btn btn-outline-secondary" type="button" onclick="togglePass()"><i class="bi bi-eye"></i></button>
+                <div class="col-md-4">
+                    <label class="form-label">Admin User <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="connUser" placeholder="6666">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Admin Pass <span class="text-danger">*</span></label>
+                    <div class="input-group">
+                        <input type="password" class="form-control" id="connPass" placeholder="••••••">
+                        <button class="btn btn-outline-secondary" type="button" onclick="togglePass()"><i class="bi bi-eye"></i></button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -371,19 +378,47 @@
             <p class="text-secondary small mb-3">Create multiple users at once by specifying a user ID range. The numeric suffix will auto-increment and agent_full_name will be generated accordingly.</p>
 
             <form id="batchForm" onsubmit="return false;">
-                <!-- Range Fields -->
+                <!-- User Input Mode Tabs -->
                 <fieldset class="fieldset-card">
-                    <legend><i class="bi bi-arrow-left-right me-1"></i> User Range</legend>
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <label class="form-label">From Agent User <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="batchFromUser" placeholder="agent001">
-                            <div class="form-text text-secondary">Starting agent user (e.g. agent001)</div>
+                    <legend><i class="bi bi-people me-1"></i> Agent Users</legend>
+                    <ul class="nav nav-tabs mb-3" id="batchModeTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="tab-range" data-bs-toggle="tab" data-bs-target="#pane-range" type="button" role="tab" aria-controls="pane-range" aria-selected="true">
+                                <i class="bi bi-arrow-left-right me-1"></i> Range
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="tab-list" data-bs-toggle="tab" data-bs-target="#pane-list" type="button" role="tab" aria-controls="pane-list" aria-selected="false">
+                                <i class="bi bi-list-ul me-1"></i> List
+                            </button>
+                        </li>
+                    </ul>
+                    <div class="tab-content" id="batchModeContent">
+                        <!-- Range Tab -->
+                        <div class="tab-pane fade show active" id="pane-range" role="tabpanel" aria-labelledby="tab-range">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">From Agent User <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="batchFromUser" placeholder="agent001">
+                                    <div class="form-text text-secondary">Starting agent user (e.g. agent001)</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">To Agent User <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="batchToUser" placeholder="agent050">
+                                    <div class="form-text text-secondary">Ending agent user (e.g. agent050)</div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label">To Agent User <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="batchToUser" placeholder="agent050">
-                            <div class="form-text text-secondary">Ending agent user (e.g. agent050)</div>
+                        <!-- List Tab -->
+                        <div class="tab-pane fade" id="pane-list" role="tabpanel" aria-labelledby="tab-list">
+                            <label class="form-label">Agent Usernames <span class="text-danger">*</span></label>
+                            <textarea class="form-control" id="batchUserList" rows="8" placeholder="Enter one agent username per line, e.g.:
+agent001
+agent002
+john_smith
+jane_doe
+operator10"></textarea>
+                            <div class="form-text text-secondary">One username per line. agent_full_name will be auto-generated from the username. Blank lines are ignored.</div>
                         </div>
                     </div>
                 </fieldset>
@@ -971,6 +1006,28 @@ function getBaseUrl() {
     return `${proto}${domain}/vicidial/non_agent_api.php?source=adminpanel&user=${encodeURIComponent(user)}&pass=${encodeURIComponent(pass)}`;
 }
 
+// Route requests through proxy.php to avoid CORS issues
+async function proxyFetch(targetUrl) {
+    const proxyUrl = `proxy.php?url=${encodeURIComponent(targetUrl)}`;
+    return fetch(proxyUrl);
+}
+
+// =============================================================================
+//  DISPLAY RESPONSE (auto-detect HTML)
+// =============================================================================
+function displayResponse(el, text) {
+    if (!text) {
+        el.textContent = '(empty response)';
+        return;
+    }
+    // Check if response contains HTML tags
+    if (/<[a-z][\s\S]*>/i.test(text)) {
+        el.innerHTML = text;
+    } else {
+        el.textContent = text;
+    }
+}
+
 // =============================================================================
 //  SUBMIT SINGLE API CALL
 // =============================================================================
@@ -993,9 +1050,9 @@ async function submitAPI() {
     resArea.textContent = '⏳ Sending request...';
 
     try {
-        const resp = await fetch(url);
+        const resp = await proxyFetch(url);
         const text = await resp.text();
-        resArea.textContent = text || '(empty response)';
+        displayResponse(resArea, text);
     } catch(err) {
         resArea.textContent = `❌ Error: ${err.message}\n\nURL attempted:\n${url}`;
     }
@@ -1035,24 +1092,55 @@ function parseUserRange(from, to) {
     return users;
 }
 
+function parseUserList(text) {
+    const lines = text.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
+    if (lines.length === 0) return null;
+    return lines.map(username => {
+        // Generate a readable full name from the username
+        const fullName = username.replace(/[_\-\.]/g, ' ').replace(/(\d+)/g, ' $1').replace(/\s+/g, ' ').trim();
+        return {
+            agent_user: username,
+            agent_full_name: fullName || username
+        };
+    });
+}
+
+function getBatchMode() {
+    // Check which tab is active
+    const listTab = document.getElementById('tab-list');
+    return listTab && listTab.classList.contains('active') ? 'list' : 'range';
+}
+
 async function runBatch() {
     if (batchRunning) return;
     const base = getBaseUrl();
     if (!base) return;
-
-    const fromUser = document.getElementById('batchFromUser').value.trim();
-    const toUser = document.getElementById('batchToUser').value.trim();
-    if (!fromUser || !toUser) { alert('Please fill From Agent User and To Agent User.'); return; }
 
     const agentPass = document.getElementById('batchAgentPass').value.trim();
     const agentLevel = document.getElementById('batchAgentLevel').value;
     const agentGroup = document.getElementById('batchAgentGroup').value.trim();
     if (!agentPass || !agentGroup) { alert('Please fill Agent Pass and Agent User Group.'); return; }
 
-    const users = parseUserRange(fromUser, toUser);
-    if (!users || users.length === 0) {
-        alert('Invalid user range. Ensure both have the same prefix and valid numeric suffixes (from <= to).');
-        return;
+    let users = null;
+    const mode = getBatchMode();
+
+    if (mode === 'list') {
+        const text = document.getElementById('batchUserList').value.trim();
+        if (!text) { alert('Please enter at least one username in the list.'); return; }
+        users = parseUserList(text);
+        if (!users || users.length === 0) {
+            alert('No valid usernames found. Enter one username per line.');
+            return;
+        }
+    } else {
+        const fromUser = document.getElementById('batchFromUser').value.trim();
+        const toUser = document.getElementById('batchToUser').value.trim();
+        if (!fromUser || !toUser) { alert('Please fill From Agent User and To Agent User.'); return; }
+        users = parseUserRange(fromUser, toUser);
+        if (!users || users.length === 0) {
+            alert('Invalid user range. Ensure both have the same prefix and valid numeric suffixes (from <= to).');
+            return;
+        }
     }
 
     // Optional fields
@@ -1104,7 +1192,7 @@ async function runBatch() {
         appendLog(log, `→ Creating ${u.agent_user} (${u.agent_full_name})...`, 'log-info');
 
         try {
-            const resp = await fetch(url);
+            const resp = await proxyFetch(url);
             const text = await resp.text();
             if (text.includes('SUCCESS')) {
                 success++;
